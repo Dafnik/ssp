@@ -1,8 +1,8 @@
 # Static Site Preview (SSP)
-Deploy static site previews to a self-hosted server via ssh
+Deploy static site previews to a self-hosted server via ssh.
 
-## Please note that this is in no way secure a solution for hosting static site previews.
-- You should only use this in repositories you **trust**.
+## Please note that this is in no way a secure solution for hosting static site previews.
+- You should only use this in repositories you **DO NOT** trust.
 - You should only use this on a server
   - you **DO NOT** care about.
   - where you **DO NOT** have sensitive information stored.
@@ -45,23 +45,25 @@ jobs:
           # username: ubuntu
           # key: ${{ secrets.PREVIEW_SSH_PRIVATE_KEY }}
           # strip_components: 0
+          # delete_threshold_days: 30
 ```
 
-| Inputs             | Default value | Required | Description                                                                    |
-|--------------------|---------------|----------|--------------------------------------------------------------------------------|
-| `source`           |               | x        | Path to the files which should be deployed                                     |
-| `target`           |               | x        | Preview server target path, must be a directory path.                          |
-| `host`             |               | x        | Preview server domain                                                          |
-| `port`             | `22`          |          | Preview server ssh port                                                        |
-| `username`         |               | x        | Preview server ssh username                                                    |
-| `key`              |               | x        | Preview server ssh key content of private key. ex raw content of ~/.ssh/id_rsa |
-| `strip_components` | `0`           |          | remove the specified number of leading path elements                           |
+| Inputs                  | Default value | Required | Description                                                                    |
+|-------------------------|---------------|----------|--------------------------------------------------------------------------------|
+| `source`                |               | x        | Path to the files which should be deployed                                     |
+| `target`                |               | x        | Preview server target path, must be a directory path.                          |
+| `host`                  |               | x        | Preview server domain                                                          |
+| `port`                  | `22`          |          | Preview server ssh port                                                        |
+| `username`              |               | x        | Preview server ssh username                                                    |
+| `key`                   |               | x        | Preview server ssh key content of private key. ex raw content of ~/.ssh/id_rsa |
+| `strip_components`      | `0`           |          | remove the specified number of leading path elements                           |
+| `delete_threshold_days` | `30`          |          | Number of days after inactive previews are deleted                             |
 
 
 Furthermore, see [action.yml](action.yml)
 
 ### NGINX Configuration
-Preview are going to stored in the `/var/www/preview` directory.
+Previews are going to stored in the `/var/www/preview` directory.
 ```
 /etc/nginx/site-enabled/preview
 ```
