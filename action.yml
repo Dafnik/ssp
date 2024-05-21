@@ -1,0 +1,103 @@
+name: 'Static Site Preview (SSP)'
+description: 'Deploy static site previews to a self-hosted server via ssh'
+author: "Dafnik"
+branding:
+  icon: 'arrow-down-circle'
+  color: 'purple'
+
+inputs:
+  source:
+    required: true
+    description: 'Path to the files which should be deployed'
+  target:
+    required: true
+    description: 'Preview server target path, must be a directory path.'
+  host:
+    required: true
+    description: 'Preview server domain'
+  port:
+    description: 'Preview server ssh port'
+    default: '22'
+  username:
+    required: true
+    description: 'Preview server ssh username'
+  key:
+    description: 'Preview server ssh key content of private key. ex raw content of ~/.ssh/id_rsa'
+  strip_components:
+    description: 'remove the specified number of leading path elements'
+    default: '0'
+  delete_treshhold_days:
+    default: '30'
+    description: 'Number of days after inactive previews are deleted'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check if run from pull request
+      shell: bash
+      if: github.event_name != 'pull_request'
+      run : |
+        echo "static-site-preview can only be run from pull request"
+        echo "Check for pull request like this"
+        echo "if: github.event_name == 'pull_request'"
+        exit 1
+
+    - id: setup
+      shell: bash
+      name: Setup hash identifier & date
+      run: |
+        echo "name=${{ github.event.repository.name }}-${{ github.event.number }}" >> "$GITHUB_OUTPUT"
+        current_date=$(date '+%Y-%m-%d %H:%M:%S (%Z)')
+        echo "current_date=$current_date" >> "$GITHUB_OUTPUT"
+        future_date=$(date -d "+${{ inputs.delete_treshhold_days }} days" '+%Y-%m-%d')
+        echo "future_date=$future_date" >> "$GITHUB_OUTPUT"
+
+    - id: hash
+      shell: bash
+      name: Create hash
+      run: |
+        echo Hash identifier: "${{ steps.setup.outputs.name }}"
+        hash=$(echo -n "${{ steps.setup.outputs.name }}" | md5sum | awk '{print $1}')
+        short_hash=${hash:0:10}
+        echo "md5=$short_hash" >> "$GITHUB_OUTPUT"
+        echo "url=https://$short_hash.${{ inputs.host }}" >> "$GITHUB_OUTPUT"
+
+    - name: Check if hash is empty
+      shell: bash
+      run: |
+        if [ -z "${{ steps.hash.outputs.md5 }}" ]; then
+          echo "MD5 hash is empty. Failing the workflow."
+          exit 1
+        else
+          echo "MD5 hash: ${{ steps.hash.outputs.md5 }}"
+        fi
+
+    - name: Copy source files to target server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        overwrite: true
+        host: ${{ inputs.host }}
+        username: ${{ inputs.username }}
+        key: ${{ inputs.key }}
+        port: ${{ inputs.port }}
+        source: ${{ inputs.source }}
+        target: "${{ inputs.target }}/${{ steps.hash.outputs.md5 }}"
+        strip_components: ${{ inputs.strip_components }}
+
+    - name: Create or update sticky pull request comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        message: |
+          This pull request has been automatically deployed using Dafnik's static site preview (SSP) service.
+          [Learn more](https://github.com/Dafnik/ssp).
+          
+          🔎 **Commit:** ${{ github.sha }}
+          📅 **Updated at:** ${{ steps.setup.outputs.current_date }}
+          ✅ **Preview URL:** <${{ steps.hash.outputs.url }}>
+          
+          **Note:** If there is no further activity, this preview will be deleted **${{ inputs.delete_treshhold_days }} day(s) from now** on ${{ steps.setup.outputs.future_date }}.
+
+outputs:
+  url:
+    description: Deployment url
+    value: ${{ steps.hash.outputs.url }}
