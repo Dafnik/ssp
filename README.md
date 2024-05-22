@@ -1,8 +1,11 @@
 # Static Site Preview (SSP)
+
 Deploy static site previews via ssh.
 
 ## NOTICE
+
 Please note that this is in no way a secure solution for hosting static site previews.
+
 - You should only use this in repositories you **DO** trust.
 - You should only use this on a server
   - you **DO NOT** care about.
@@ -14,12 +17,15 @@ Please note that this is in no way a secure solution for hosting static site pre
   (Though this should not happen under normal circumstances, as the GitHub Action uses a hash of repository name + pull request number)
 
 ## Screenshots
+
 ### GitHub Pull Request comment
+
 ![GitHub Pull Request comment][github-pull-request-comment-screenshot]
 
 ## Usage
 
 ### GitHub Action
+
 ```yml
 name: preview
 
@@ -30,35 +36,35 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-       pull-requests: write # needed for preview pull request comment
-       actions: read
+      pull-requests: write # needed for preview pull request comment
+      actions: read
 
     # Deploy to the preview environment
     environment:
-       name: preview-${{ github.event.number }}
-       url: ${{ steps.deploy-preview.outputs.url }}
- 
+      name: preview-${{ github.event.number }}
+      url: ${{ steps.deploy-preview.outputs.url }}
+
     steps:
       - uses: actions/download-artifact@v4
         with:
-            path: ./dist
+          path: ./dist
 
       - name: deploy preview
         id: deploy-preview
         uses: dafnik/ssp@v1
         # with:
-          # source: dist/*
-          # target: /var/www/preview
-          # host: preview.yxz.abc
-          # port: 22
-          # username: ubuntu
-          # key: ${{ secrets.PREVIEW_SSH_PRIVATE_KEY }}
-          # strip_components: 0
-          # delete_threshold_days: 30
+        #   source: dist/*
+        #   target: /var/www/preview
+        #   host: preview.yxz.abc
+        #   port: 22
+        #   username: ubuntu
+        #   key: ${{ secrets.PREVIEW_SSH_PRIVATE_KEY }}
+        #   strip_components: 0
+        #   delete_threshold_days: 30
 ```
 
 | Inputs                  | Default value | Required | Description                                                                    |
-|-------------------------|---------------|----------|--------------------------------------------------------------------------------|
+| ----------------------- | ------------- | -------- | ------------------------------------------------------------------------------ |
 | `source`                |               | x        | Path to the files which should be deployed                                     |
 | `target`                |               | x        | Preview server target path, must be a directory path.                          |
 | `host`                  |               | x        | Preview server domain                                                          |
@@ -68,11 +74,12 @@ jobs:
 | `strip_components`      | `0`           |          | remove the specified number of leading path elements                           |
 | `delete_threshold_days` | `30`          |          | Number of days after inactive previews are deleted                             |
 
-
 Furthermore, see [action.yml](action.yml)
 
 ### NGINX Configuration
+
 Previews are stored in the `/var/www/preview` directory by default.
+
 ```
 # /etc/nginx/site-enabled/preview
 
@@ -134,7 +141,9 @@ server {
 ```
 
 ### Cleanup cron job
+
 Delete previews with no activity in the last 30 days.
+
 ```bash
 # /home/ubuntu/cronDeleteUnusedPreviews.sh
 
@@ -152,6 +161,7 @@ find "$SEARCH_DIR" -type d -mtime +30 -exec rm -rf {} +
 ```
 
 Crontab example:
+
 ```bash
 @daily /home/ubuntu/cronDeleteUnusedPreviews.sh
 ```
@@ -173,6 +183,7 @@ In order to release a new version of this action:
 The scripts and documentation in this project are released under the [MIT License](LICENSE).
 
 <!-- references -->
+
 [release-list]: https://github.com/dafnik/ssp/releases
 [draft-release]: .github/workflows/draft-release.yml
 [release]: .github/workflows/release.yml

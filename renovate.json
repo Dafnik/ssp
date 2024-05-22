@@ -26,12 +26,5 @@
       "groupName": "major-update"
     }
   ],
-  "extends": [
-    "config:base",
-    ":pinVersions",
-    ":unpublishSafe",
-    ":prNotPending",
-    ":preserveSemverRanges",
-    ":rebaseStalePrs"
-  ]
+  "extends": ["config:base", ":pinVersions", ":unpublishSafe", ":prNotPending", ":preserveSemverRanges", ":rebaseStalePrs"]
 }
