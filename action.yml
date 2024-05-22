@@ -1,8 +1,8 @@
 name: 'Static Site Preview (SSP)'
-description: 'Deploy static site previews to a self-hosted server via ssh'
+description: 'Deploy static site previews via ssh.'
 author: "Dafnik"
 branding:
-  icon: 'arrow-down-circle'
+  icon: 'truck'
   color: 'purple'
 
 inputs:
@@ -37,8 +37,8 @@ runs:
       shell: bash
       if: github.event_name != 'pull_request'
       run : |
-        echo "static-site-preview can only be run from pull request"
-        echo "Check for pull request like this"
+        echo "SSP can only be run from pull requests, stopping..."
+        echo "Check for pull request in the action step like this"
         echo "if: github.event_name == 'pull_request'"
         exit 1
 
@@ -66,7 +66,7 @@ runs:
       shell: bash
       run: |
         if [ -z "${{ steps.hash.outputs.md5 }}" ]; then
-          echo "MD5 hash is empty. Failing the workflow."
+          echo "MD5 hash generation failed, stopping..."
           exit 1
         else
           echo "MD5 hash: ${{ steps.hash.outputs.md5 }}"
@@ -88,7 +88,7 @@ runs:
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         message: |
-          This pull request has been automatically deployed using Dafnik's static site preview (SSP) service.
+          This pull request has been automatically deployed using Dafnik's static site preview (SSP) action.
           [Learn more](https://github.com/Dafnik/ssp).
           
           🔎 **Commit:** ${{ github.sha }}
