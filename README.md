@@ -28,7 +28,7 @@ on: [pull_request]
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     permissions:
        pull-requests: write # needed for preview pull request comment
        actions: read
@@ -77,52 +77,59 @@ Previews are stored in the `/var/www/preview` directory by default.
 # /etc/nginx/site-enabled/preview
 
 server {
-   listen 80;
-   server_name *.preview.xyz.abc;
-   return 301 https://$server_name$request_uri;
+    listen 80;
+    server_name *.preview.xyz.abc;
+    return 301 https://$server_name$request_uri;
 }
 
 
 server {
-   listen 443 ssl http2;
-   server_name ~^(?P<sub>.+)\.preview\.xyz\.abc$;
+    listen 443 ssl http2;
+    server_name ~^(?P<sub>.+)\.preview\.xyz\.abc$;
 
-   ssl_certificate /etc/letsencrypt/live/preview.xyz.abc/fullchain.pem;
-   ssl_certificate_key /etc/letsencrypt/live/preview.xyz.abc/privkey.pem;
-        
-   # GZIP
-   gzip on;
-   gzip_disable "msie6";
+    ssl_certificate /etc/letsencrypt/live/preview.xyz.abc/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/preview.xyz.abc/privkey.pem;
 
-   gzip_vary on;
-   gzip_proxied any;
-   gzip_comp_level 6;
-   gzip_buffers 16 8k;
-   gzip_http_version 1.1;
-   gzip_min_length 256;
-   gzip_types text/xml text/javascript font/ttf font/eot font/otf application/rdf+xml application/x-javascript application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
-   
-   # Remove X-Powered-By, which is an information leak
-   fastcgi_hide_header X-Powered-By;
+    # GZIP
+    gzip on;
+    gzip_disable "msie6";
 
-   # Do not send nginx server header
-   server_tokens off;
-   
-   add_header Access-Control-Allow-Origin *;
-   add_header Strict-Transport-Security  "max-age=31536000; includeSubDomains; preload" always;
-   add_header Referrer-Policy            "strict-origin" always;
-   add_header X-Frame-Options            "SAMEORIGIN"    always;
-   add_header X-XSS-Protection           "1; mode=block" always;
-   add_header X-Content-Type-Options     "nosniff"       always;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_min_length 256;
+    gzip_types text/xml text/javascript font/ttf font/eot font/otf application/rdf+xml application/x-javascript application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
 
-   access_log on;
-   error_log off;
+    # Remove X-Powered-By, which is an information leak
+    fastcgi_hide_header X-Powered-By;
 
-   root /var/www/preview/$sub;
+    # Do not send nginx server header
+    server_tokens off;
 
-   location / {
-      index index.html;
-   }
+    add_header Access-Control-Allow-Origin *;
+    add_header Strict-Transport-Security  "max-age=31536000; includeSubDomains; preload" always;
+    add_header Referrer-Policy            "strict-origin" always;
+    add_header X-Frame-Options            "SAMEORIGIN"    always;
+    add_header X-XSS-Protection           "1; mode=block" always;
+    add_header X-Content-Type-Options     "nosniff"       always;
+
+    access_log on;
+    error_log off;
+
+    root /var/www/preview/$sub;
+
+    location / {
+        # Check if the root directory exists
+        if (!-d $document_root) {
+            return 404;
+        }
+
+        try_files $uri $uri/ /index.html;
+
+        index index.html;
+    }
 }
 ```
 
