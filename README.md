@@ -1,14 +1,21 @@
 # Static Site Preview (SSP)
-Deploy static site previews to a self-hosted server via ssh.
+Deploy static site previews via ssh.
 
-## Please note that this is in no way a secure solution for hosting static site previews.
-- You should only use this in repositories you **DO NOT** trust.
+## NOTICE
+Please note that this is in no way a secure solution for hosting static site previews.
+- You should only use this in repositories you **DO** trust.
 - You should only use this on a server
   - you **DO NOT** care about.
   - where you **DO NOT** have sensitive information stored.
   - where you **DO NOT** run other sensitive services.
 - Unless you jail the specific ssh user, you are allowing a GitHub Action full ssh access to your server.
-- You allow any other repository with access to the same preview server to overwrite each others previews. (This should not happen under normal circumstances, as the GitHub Action uses a hash of repository name + pull request number)
+- You allow any other repository with access to the same preview server to overwrite each other's previews.
+
+  (Though this should not happen under normal circumstances, as the GitHub Action uses a hash of repository name + pull request number)
+
+## Screenshots
+### GitHub Pull Request comment
+![GitHub Pull Request comment][github-pull-request-comment-screenshot]
 
 ## Usage
 
@@ -21,14 +28,16 @@ on: [pull_request]
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
     permissions:
-       pull-requests: write
+       pull-requests: write # needed for preview pull request comment
        actions: read
 
     # Deploy to the preview environment
     environment:
        name: preview-${{ github.event.number }}
        url: ${{ steps.deploy-preview.outputs.url }}
+ 
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -63,12 +72,10 @@ jobs:
 Furthermore, see [action.yml](action.yml)
 
 ### NGINX Configuration
-Previews are going to stored in the `/var/www/preview` directory.
+Previews are stored in the `/var/www/preview` directory by default.
 ```
-/etc/nginx/site-enabled/preview
-```
+# /etc/nginx/site-enabled/preview
 
-```
 server {
    listen 80;
    server_name *.preview.xyz.abc;
@@ -120,7 +127,7 @@ server {
 ```
 
 ### Cleanup cron job
-Delete previews with not activity in the last 30 days.
+Delete previews with no activity in the last 30 days.
 ```bash
 # /home/ubuntu/cronDeleteUnusedPreviews.sh
 
@@ -163,3 +170,4 @@ The scripts and documentation in this project are released under the [MIT Licens
 [draft-release]: .github/workflows/draft-release.yml
 [release]: .github/workflows/release.yml
 [release-workflow-runs]: https://github.com/dafnik/ssp/actions/workflows/release.yml
+[github-pull-request-comment-screenshot]: .github/ssp/pr-comment-screenshot.png
