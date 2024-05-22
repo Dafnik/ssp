@@ -1,0 +1,14 @@
+{
+  "name": "ssp",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "format:check": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "author": "Dafnik",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "3.2.5"
+  }
+}

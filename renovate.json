@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "baseBranches": ["main"],
-  "enabledManagers": ["github-actions"],
+  "enabledManagers": ["github-actions", "npm"],
   "semanticCommits": "enabled",
   "semanticCommitScope": "",
   "semanticCommitType": "build",
@@ -26,5 +26,12 @@
       "groupName": "major-update"
     }
   ],
-  "extends": ["config:base", ":pinVersions", ":unpublishSafe", ":prNotPending", ":preserveSemverRanges", ":rebaseStalePrs"]
+  "extends": [
+    "config:base",
+    ":pinVersions",
+    ":unpublishSafe",
+    ":prNotPending",
+    ":preserveSemverRanges",
+    ":rebaseStalePrs"
+  ]
 }
