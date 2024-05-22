@@ -63,8 +63,9 @@ jobs:
         #   delete_threshold_days: 30
 ```
 
+<!-- prettier-ignore-start -->
 | Inputs                  | Default value | Required | Description                                                                    |
-| ----------------------- | ------------- | -------- | ------------------------------------------------------------------------------ |
+|-------------------------|---------------|----------|--------------------------------------------------------------------------------|
 | `source`                |               | x        | Path to the files which should be deployed                                     |
 | `target`                |               | x        | Preview server target path, must be a directory path.                          |
 | `host`                  |               | x        | Preview server domain                                                          |
@@ -73,6 +74,7 @@ jobs:
 | `key`                   |               | x        | Preview server ssh key content of private key. ex raw content of ~/.ssh/id_rsa |
 | `strip_components`      | `0`           |          | remove the specified number of leading path elements                           |
 | `delete_threshold_days` | `30`          |          | Number of days after inactive previews are deleted                             |
+<!-- prettier-ignore-end -->
 
 Furthermore, see [action.yml](action.yml)
 
