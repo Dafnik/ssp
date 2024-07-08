@@ -2,9 +2,11 @@
 
 ## Supported Versions
 
+<!-- prettier-ignore-start -->
 | Version | Supported          |
-| ------- | ------------------ |
+|---------|--------------------|
 | 1.x.x   | :white_check_mark: |
+<!-- prettier-ignore-end -->
 
 ## Reporting a Vulnerability
 
