@@ -73,7 +73,7 @@ runs:
         fi
 
     - name: Copy source files to target server
-      uses: appleboy/scp-action@v0.1.7
+      uses: appleboy/scp-action@v1.0.0
       with:
         overwrite: true
         host: ${{ inputs.host }}
