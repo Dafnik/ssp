@@ -85,7 +85,7 @@ runs:
         strip_components: ${{ inputs.strip_components }}
 
     - name: Create or update sticky pull request comment
-      uses: marocchino/sticky-pull-request-comment@v2
+      uses: marocchino/sticky-pull-request-comment@v3
       with:
         message: |
           This pull request has been automatically deployed using Dafnik's static site preview (SSP) action.
